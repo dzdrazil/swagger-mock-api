@@ -1,0 +1,25 @@
+{
+  "name": "swagger-mock-api",
+  "version": "1.0.0",
+  "description": "Creates a connect middleware mock API from a Swagger 2.0 YAML file",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/dzdrazil/swagger-mock-api"
+  },
+  "bugs": {
+    "url": "https://github.com/dzdrazil/swagger-mock-api/issues"
+  },
+  "scripts": {
+    "start": "node demo/index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "dzdrazil",
+  "license": "MIT",
+  "dependencies": {
+    "js-yaml": "~3.3.1",
+    "hoek": "~2.14.0",
+    "routes": "~2.0.0",
+    "chance": "~0.7.5"
+  }
+}
