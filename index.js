@@ -12,7 +12,15 @@ var chance = new Chance();
 var debug = console.log.bind(console);
 
 module.exports = function(config) {
-    var doc = yaml.load(fs.readFileSync(config.yamlPath, 'utf8'));
+    var doc;
+    if (config.yamlPath) {
+        doc = yaml.load(fs.readFileSync(config.yamlPath, 'utf8'));
+    } else if (config.jsonPath) {
+        doc = require(jsonPath);
+    } else {
+        throw new Error('swagger-mock-api conifg requires either a json or yaml file');
+    }
+
     var basepath = doc.basePath;
 
     var definitions = parseDefinitions(doc.definitions, {});

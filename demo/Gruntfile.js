@@ -11,7 +11,7 @@ module.exports = function(grunt) {
           keepalive: true,
           middleware: [
             mockApi({
-                  yamlPath: path.join(__dirname, './test.yaml')
+                  yamlPath: path.join(__dirname, './test.json')
               })
           ],
         },
