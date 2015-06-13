@@ -21,23 +21,32 @@ If you're not auto-loading grunt tasks, find in your Gruntfile where the tasks a
 Then, configure a task like so:
 
 ```javascript
+'use strict';
 
 var path = require('path');
-var mockApi = require('path to mockApi');
+var mockApi = require('swagger-mock-api');
 
-grunt.initConfig({
-  connect: {
-    server: {
-      options: {
-        middleware: [
-          mockApi({
-                yamlPath: path.join(__dirname, 'relative path to swagger yaml file')
-            })
-        ],
+module.exports = function(grunt) {
+  grunt.initConfig({
+    connect: {
+      server: {
+        options: {
+          keepalive: true,
+          middleware: [
+            mockApi({
+                  yamlPath: path.join(__dirname, 'path to yaml file')
+              })
+          ],
+        },
       },
     },
-  },
-});
+  });
+
+  grunt.loadNpmTasks('grunt-contrib-connect');
+
+  grunt.registerTask('default', ['connect']);
+};
+
 ```
 
 ## Specifying custom Chance options

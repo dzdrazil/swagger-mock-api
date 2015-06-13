@@ -32,10 +32,12 @@ module.exports = function(config) {
 
         debug('Request: %s %s', req.method, path);
         var matchingRoute = router.match('/' + method + path);
-        if (!matchingRoute) next();
+        if (!matchingRoute) return next();
 
         res.setHeader('Content-Type', 'application/json');
-        res.write(matchingRoute.fn());
+        var response = matchingRoute.fn();
+
+        res.write(response !== null ? JSON.stringify(response) : '');
         res.end();
     }
 }
