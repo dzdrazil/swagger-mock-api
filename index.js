@@ -1,291 +1,323 @@
 'use strict';
 
-var fs = require('fs');
-var url = require('url');
-var yaml = require('js-yaml');
-var hoek = require('hoek');
-var Routes = require('routes');
-var router = new Routes();
-var Chance = require('chance');
-var chance = new Chance();
+var _Object$keys = require('babel-runtime/core-js/object/keys')['default'];
+
+var _interopRequireDefault = require('babel-runtime/helpers/interop-require-default')['default'];
+
+var _fs = require('fs');
+
+var _fs2 = _interopRequireDefault(_fs);
+
+var _url = require('url');
+
+var _url2 = _interopRequireDefault(_url);
+
+var _jsYaml = require('js-yaml');
+
+var _jsYaml2 = _interopRequireDefault(_jsYaml);
+
+var _hoek = require('hoek');
+
+var _hoek2 = _interopRequireDefault(_hoek);
+
+var _routes = require('routes');
+
+var _routes2 = _interopRequireDefault(_routes);
+
+var _chance = require('chance');
+
+var _chance2 = _interopRequireDefault(_chance);
+
+var router = new _routes2['default']();
+var chance = new _chance2['default']();
 
 var debug = console.log.bind(console);
 
-module.exports = function(config) {
-    var doc = yaml.load(fs.readFileSync(config.yamlPath, 'utf8'));
-    var basepath = doc.basePath;
+module.exports = function (config) {
+  var doc = undefined;
+  if (config.yamlPath) {
+    doc = _jsYaml2['default'].load(_fs2['default'].readFileSync(config.yamlPath, 'utf8'));
+  } else if (config.jsonPath) {
+    doc = require(jsonPath);
+  } else {
+    throw new Error('swagger-mock-api conifg requires either a json or yaml file');
+  }
 
-    var definitions = parseDefinitions(doc.definitions, {});
-    var paths = parsePaths(doc.paths, definitions);
+  var basepath = doc.basePath;
 
-    configureRouter(router, paths);
+  var definitions = parseDefinitions(doc.definitions, {});
+  var paths = parsePaths(doc.paths, definitions);
 
-    // return connect function
-    return function(req, res, next) {
-        var method = req.method.toLowerCase();
+  configureRouter(router, paths);
 
-        var path = url.parse(req.url).pathname;
-        path = path.replace(basepath + '/', '');
-        if (path.charAt(0) !== '/') {
-            path = '/' + path;
-        }
+  // return connect function
+  return function (req, res, next) {
+    var method = req.method.toLowerCase();
 
-        debug('Request: %s %s', req.method, path);
-        var matchingRoute = router.match('/' + method + path);
-        if (!matchingRoute) next();
-
-        res.setHeader('Content-Type', 'application/json');
-        res.write(matchingRoute.fn());
-        res.end();
+    var path = _url2['default'].parse(req.url).pathname;
+    path = path.replace(basepath + '/', '');
+    if (path.charAt(0) !== '/') {
+      path = '/' + path;
     }
-}
 
-function parseDefinitions(defMap, definitions) {
-    var k;
-    var count = Object.keys(defMap).length;
-    var definition;
+    debug('Request: %s %s', req.method, path);
+    var matchingRoute = router.match('/' + method + path);
 
-    for (k in defMap) {
-        if (definitions[k]) {
-            count--;
-            continue;
-        }
+    if (!matchingRoute) return next();
 
-        definition = parseDefinition(k, defMap, definitions);
-        if (definition === null) {
-            continue;
-        } else {
-            definitions[k] = definition;
-            count--;
-        }
+    res.setHeader('Content-Type', 'application/json');
+    var response = matchingRoute.fn();
+
+    res.write(response !== null ? JSON.stringify(response) : '');
+    res.end();
+  };
+};
+
+function parseDefinitions(_x, _x2) {
+  var _again = true;
+
+  _function: while (_again) {
+    var defMap = _x,
+        definitions = _x2;
+    count = k = definition = undefined;
+    _again = false;
+
+    var count = _Object$keys(defMap).length;
+
+    for (var k in defMap) {
+      if (definitions[k]) {
+        count--;
+        continue;
+      }
+
+      var definition = parseDefinition(k, defMap, definitions);
+      if (definition === null) {
+        continue;
+      } else {
+        definitions[k] = definition;
+        count--;
+      }
     }
 
     if (count === 0) {
-        return definitions;
+      return definitions;
     }
-    return parseDefinitions(defMap, definitions);
+    _x = defMap;
+    _x2 = definitions;
+    _again = true;
+    continue _function;
+  }
 }
 
 function parseDefinition(key, defMap, definitions) {
-    var propDef = defMap[key];
-    var ref = {};
+  var propDef = defMap[key];
+  var ref = {};
 
-    if (propDef.allOf) {
-        try {
-            return propDef.allOf.reduce(function(acc, def) {
-                if (def.$ref) {
-                    return hoek.merge(acc, getRef(def.$ref, definitions));
-                } else {
-                    return hoek.merge(acc, def.properties);
-                }
-            }, {});
-        } catch(e) {
-            return null;
+  if (propDef.allOf) {
+    try {
+      return propDef.allOf.reduce(function (acc, def) {
+        if (def.$ref) {
+          return _hoek2['default'].merge(acc, getRef(def.$ref, definitions));
+        } else {
+          return _hoek2['default'].merge(acc, def.properties);
         }
-    } else {
-        //return hoek.merge({}, propDef.properties);
-        for (var k in propDef.properties) {
-            var prop = propDef.properties[k];
-            if (prop.type === 'array' && prop.items.$ref) {
-                try {
-                    ref[k] = prop;
-                    ref[k].items = getRef(prop.items.$ref, definitions);
-                } catch(e) {
-                    return null;
-                }
-            } else {
-                ref[k] = hoek.merge({}, prop);
-            }
-        }
+      }, {});
+    } catch (e) {
+      return null;
     }
+  } else {
+    for (var k in propDef.properties) {
+      var prop = propDef.properties[k];
+      if (prop.type === 'array' && prop.items.$ref) {
+        try {
+          ref[k] = prop;
+          ref[k].items = getRef(prop.items.$ref, definitions);
+        } catch (e) {
+          return null;
+        }
+      } else {
+        ref[k] = _hoek2['default'].merge({}, prop);
+      }
+    }
+  }
 
-    return ref;
+  return ref;
 }
 
 function getRef(path, definitions) {
-    var segments = path.split('/');
-    var ref = segments[segments.length - 1];
+  var segments = path.split('/');
+  var ref = segments[segments.length - 1];
 
-    if (!definitions[ref]) throw new Error('no definition found');
-    return definitions[ref];
+  if (!definitions[ref]) throw new Error('no definition found');
+  return definitions[ref];
 }
 
 function parsePaths(pathDefs, definitions) {
-    var ret = {};
+  var ret = {};
 
-    var k;
-    for (k in pathDefs) {
-        ret[k] = flattenPathResponseDefs(
-            hoek.clone(pathDefs[k]),
-            definitions
-        );
-    }
+  for (var k in pathDefs) {
+    ret[k] = flattenPathResponseDefs(_hoek2['default'].clone(pathDefs[k]), definitions);
+  }
 
-    return ret;
+  return ret;
 }
 
 function flattenPathResponseDefs(pathDef, definitions) {
-    var k;
-    var path;
-    var mK;
-    var methodDef;
-    var rK;
-    var response;
+  for (var mK in pathDef) {
+    var methodDef = pathDef[mK].responses;
 
-    for (mK in pathDef) {
+    for (var rK in methodDef) {
+      if (methodDef[rK].schema && methodDef[rK].schema.items && methodDef[rK].schema.items.$ref) {
 
-        methodDef = pathDef[mK].responses;
-
-        for (rK in methodDef) {
-            if (methodDef[rK].schema &&
-                    methodDef[rK].schema.items
-                    && methodDef[rK].schema.items.$ref) {
-
-                methodDef[rK].schema.items = getRef(methodDef[rK].schema.items.$ref, definitions);
-            } else if (methodDef[rK].schema && methodDef[rK].schema.$ref) {
-                methodDef[rK].schema = getRef(methodDef[rK].schema.$ref, definitions);
-            }
-        }
+        methodDef[rK].schema.items = getRef(methodDef[rK].schema.items.$ref, definitions);
+      } else if (methodDef[rK].schema && methodDef[rK].schema.$ref) {
+        methodDef[rK].schema = getRef(methodDef[rK].schema.$ref, definitions);
+      }
     }
+  }
 
-    return pathDef;
+  return pathDef;
 }
 
 function configureRouter(router, paths) {
-    var pk;
-    var mk;
-    var pathDef;
-    var method;
+  var pk;
+  var mk;
+  var pathDef;
+  var method;
 
-    for (pk in paths) {
-        pathDef = paths[pk];
-        for (mk in pathDef) {
-            method = pathDef[mk];
-            var path = correctPath(pk);
-            debug('ADDING ROUTE: ', mk.toUpperCase() + ' ' + pk);
-            router.addRoute('/' + mk + path, function(method) {
-                return  respond(method.responses);
-            }.bind(router, method));
-        }
+  for (var _pk in paths) {
+    var _pathDef = paths[_pk];
+    for (var _mk in _pathDef) {
+      var _method = _pathDef[_mk];
+      var path = correctPath(_pk);
+      debug('ADDING ROUTE: ', _mk.toUpperCase() + ' ' + _pk);
+
+      router.addRoute('/' + _mk + path, (function (method) {
+        return respond(method.responses);
+      }).bind(router, _method));
     }
+  }
 }
 
 function correctPath(path) {
-    var uri = path.replace(/^\/?|\/?$/, '');
-    var segments = uri.split('/');
+  var uri = path.replace(/^\/?|\/?$/, '');
+  var segments = uri.split('/');
 
-    return '/' +
-        segments
-        .map(function(s) {
-            if (s.charAt(0) === '{' && s.charAt(s.length - 1) === '}') {
-                s = s.slice(1, -1);
-                return ':' + s;
-            }
+  return '/' + segments.map(function (s) {
+    if (s.charAt(0) === '{' && s.charAt(s.length - 1) === '}') {
+      s = s.slice(1, -1);
+      return ':' + s;
+    }
 
-            return s;
-        })
-        .join('/');
+    return s;
+  }).join('/');
 }
 
 function respond(possibleResponseTypes) {
-    var k;
-    for (k in possibleResponseTypes) {
-        if (k === 'default') continue;
-        if (parseInt(k) < 300) {
-            return generateResponse(possibleResponseTypes[k]);
-        }
+  for (var k in possibleResponseTypes) {
+    if (k === 'default') continue;
+    if (parseInt(k) < 300) {
+      return generateResponse(possibleResponseTypes[k]);
     }
-    if (possibleResponseTypes['default']) {
-        return generateResponse(possibleResponseTypes['default']);
-    }
-    return null;
+  }
+  if (possibleResponseTypes['default']) {
+    return generateResponse(possibleResponseTypes['default']);
+  }
+  return null;
 }
 
 function generateResponse(definition) {
-    var schema = definition.schema;
-    if (!schema) {
-        return null;
-    }
+  var schema = definition.schema;
+  if (!schema) {
+    return null;
+  }
 
-    if (schema.type === 'array') {
-        return generateArray(schema);
-    }
+  if (schema.type === 'array') {
+    return generateArray(schema);
+  }
 
-    return generateObject(schema);
+  return generateObject(schema);
 }
 
 function generateObject(schema) {
-    var k;
-    var ret = {};
-    for (k in schema) {
-        if (schema[k].type === 'array') {
-            ret[k] = generateArray(schema[k]);
-            continue;
-        }
-        ret[k] = swaggerToChance(schema[k]);
+  var ret = {};
+  for (var k in schema) {
+    if (schema[k].type === 'array') {
+      ret[k] = generateArray(schema[k]);
+      continue;
     }
-    return ret;
+    ret[k] = swaggerToChance(schema[k]);
+  }
+  return ret;
 }
 
 function generateArray(schema) {
-    var options = hoek.merge({min: 0, max: 10}, schema['x-type-options']);
-    var iterations = chance.integer(options);
-    var i;
-    var ret = [];
-    var method;
-    if (schema.type && !schema.type.type) { // schema.type.type indicates that type is a param key, not swagger type
-        method = swaggerToChance;
-    } else {
-        method = generateObject;
-    }
-    for (i = 0; i < iterations; i++) {
-        ret.push(method(schema.items));
-    }
+  var options = _hoek2['default'].merge({ min: 0, max: 10 }, schema['x-type-options']);
+  var iterations = chance.integer(options);
+  var ret = [];
+  var method = undefined;
 
-    return ret;
+  if (schema.type && !schema.type.type) {
+    // schema.type.type indicates that type is a param key, not swagger type
+    method = swaggerToChance;
+  } else {
+    method = generateObject;
+  }
+  for (var i = 0; i < iterations; i++) {
+    ret.push(method(schema.items));
+  }
+
+  return ret;
 }
 
 function swaggerToChance(typedef) {
-    var method;
-    if (typedef['x-chance-type']) {
-        method = typedef['x-chance-type'];
-    } else if (typedef.type === 'array') {
-        return generateArray(typedef);
-    } else if (typedef.type) {
-        method = mapToChance(typedef.type, typedef);
-    } else {
-        return generateObject(typedef);
-    }
+  var method = undefined;
+  if (typedef['x-chance-type']) {
+    method = typedef['x-chance-type'];
+  } else if (typedef.type === 'array') {
+    return generateArray(typedef);
+  } else if (typedef.type) {
+    method = mapToChance(typedef.type, typedef);
+  } else {
+    return generateObject(typedef);
+  }
 
-    var options;
-    if (typedef['x-type-options']) {
-       return chance[method](typedef['x-type-options']);
-    } else {
-        return chance[method]();
-    }
+  if (typedef['x-type-options']) {
+    return chance[method](typedef['x-type-options']);
+  } else {
+    return chance[method]();
+  }
 }
 
 function mapToChance(type) {
-    var method;
-    switch (type) {
-        case 'integer': method = 'integer'; break;
-        case 'long': method = 'integer'; break;
-        case 'float': method = 'floating'; break;
-        case 'double': method = 'floating'; break;
-        case 'string': method = 'string'; break;
-        case 'byte': return new Buffer('' + chance.integer({min: 0, max: 255})).toString('base64'); break;
-        case 'boolean': method = 'bool'; break;
-        case 'date': method = 'date'; break;
-        case 'dateTime': method = 'date'; break;
-        default:
-            if (chance[type]) {
-                 method = type;
-                 break;
-            }
-            console.log('unfound type!');
-            console.log(type);
-            console.log(arguments[1])
-            throw new Error('No chance equivalent for type: ' + type);
-    }
-    return method;
+  var method = undefined;
+  switch (type) {
+    case 'integer':
+      method = 'integer';break;
+    case 'long':
+      method = 'integer';break;
+    case 'float':
+      method = 'floating';break;
+    case 'double':
+      method = 'floating';break;
+    case 'string':
+      method = 'string';break;
+    case 'byte':
+      return new Buffer('' + chance.integer({ min: 0, max: 255 })).toString('base64');break;
+    case 'boolean':
+      method = 'bool';break;
+    case 'date':
+      method = 'date';break;
+    case 'dateTime':
+      method = 'date';break;
+    default:
+      if (chance[type]) {
+        method = type;
+        break;
+      }
+      debug('unfound type!');
+      debug(type);
+      throw new Error('No chance equivalent for type: ' + type);
+  }
+  return method;
 }
