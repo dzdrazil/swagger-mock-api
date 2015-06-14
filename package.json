@@ -11,17 +11,18 @@
     "url": "https://github.com/dzdrazil/swagger-mock-api/issues"
   },
   "scripts": {
-    "build": "node node_modules/babel/bin/babel/index.js --optional runtime src/index.js --out-file index.js",
+    "build": "node node_modules/babel/bin/babel/index.js --optional runtime src --out-dir dist",
     "start": "node demo/index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "dzdrazil",
   "license": "MIT",
   "dependencies": {
-    "js-yaml": "~3.3.1",
+    "chance": "~0.7.5",
     "hoek": "~2.14.0",
-    "routes": "~2.0.0",
-    "chance": "~0.7.5"
+    "js-yaml": "~3.3.1",
+    "kefir": "^2.6.0",
+    "routes": "~2.0.0"
   },
   "devDependencies": {
     "babel": "^5.5.6",

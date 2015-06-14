@@ -1,9 +1,10 @@
 'use strict';
 
 var path = require('path');
-var mockApi = require('../index');
+var mockApi = require('../dist/index2');
 
 module.exports = function(grunt) {
+
   grunt.initConfig({
     connect: {
       server: {
@@ -11,7 +12,7 @@ module.exports = function(grunt) {
           keepalive: true,
           middleware: [
             mockApi({
-                  yamlPath: path.join(__dirname, './test.json')
+                  yamlPath: path.join(__dirname, './fi-test.json')
               })
           ],
         },
