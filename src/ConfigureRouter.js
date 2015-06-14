@@ -14,7 +14,7 @@ export default function ConfigureRouter(paths) {
       let method = path[mk];
       console.log('ADDING ROUTE: ', mk.toUpperCase() + ' ' + pk);
 
-      let respond = generateResponse(method.responses);
+      let respond = generateResponse(method.responses, pk);
       router.addRoute('/' + mk + route, respond);
     }
   }
@@ -39,13 +39,17 @@ function correctPath(path) {
     .join('/');
 }
 
-function generateResponse(potentialResponses) {
+function generateResponse(potentialResponses, pk) {
   for (let k in potentialResponses) {
     if (k === 'default') continue;
 
     let responseSchema = potentialResponses[k];
 
     if (parseInt(k) < 300) {
+// console.log('----------------------');
+// console.log(pk);
+// try {console.log(MockData(responseSchema)); }
+// catch(e) {console.log(e);}
       return () => MockData(responseSchema);
     }
   }

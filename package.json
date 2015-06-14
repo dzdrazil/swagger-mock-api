@@ -20,9 +20,8 @@
   "dependencies": {
     "chance": "~0.7.5",
     "hoek": "~2.14.0",
-    "js-yaml": "~3.3.1",
-    "kefir": "^2.6.0",
-    "routes": "~2.0.0"
+    "routes": "~2.0.0",
+    "swagger-parser": "^2.4.2"
   },
   "devDependencies": {
     "babel": "^5.5.6",

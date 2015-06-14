@@ -1,7 +1,7 @@
 'use strict';
 
 var path = require('path');
-var mockApi = require('../dist/index2');
+var mockApi = require('../dist/index');
 
 module.exports = function(grunt) {
 
@@ -12,7 +12,7 @@ module.exports = function(grunt) {
           keepalive: true,
           middleware: [
             mockApi({
-                  yamlPath: path.join(__dirname, './fi-test.json')
+                  swaggerFile: path.join(__dirname, './test.yaml')
               })
           ],
         },

@@ -17,7 +17,13 @@ export default function MockData(definition) {
     }
 };
 
-function generateArray(schema) {
+function generateArray(def) {
+  let schema = hoek.clone(def);
+  if (schema.items.allOf) {
+    schema.items = schema.items.allOf.reduce((acc, def) => {
+      return hoek.merge(acc, def);
+    }, {});
+  }
   let options = hoek.merge({min: 0, max: 10}, schema['x-type-options']);
   let iterations = chance.integer(options);
   let ret = [];
@@ -35,13 +41,19 @@ function generateArray(schema) {
   return ret;
 }
 
-function generateObject(schema) {
+function generateObject(def) {
   let ret = {};
+  let schema = hoek.clone(def);
+  if (schema.properties) {
+    schema = schema.properties;
+  }
+
   for (let k in schema) {
     if (schema[k].type === 'array') {
       ret[k] = generateArray(schema[k]);
       continue;
     }
+
     ret[k] = swaggerToChance(schema[k]);
   }
   return ret;
@@ -55,10 +67,10 @@ function swaggerToChance(typedef) {
     return generateArray(typedef);
   } else if (typedef.type) {
     method = mapToChance(typedef.type, typedef);
-  } else {
+  }
+  else {
     return generateObject(typedef);
   }
-
   if (typedef['x-type-options']) {
    return chance[method](typedef['x-type-options']);
   } else {
@@ -68,9 +80,11 @@ function swaggerToChance(typedef) {
 
 function mapToChance(type) {
   let method;
+
   switch (type) {
     case 'integer': method = 'integer'; break;
     case 'long': method = 'integer'; break;
+    case 'number': method = 'floating'; break;
     case 'float': method = 'floating'; break;
     case 'double': method = 'floating'; break;
     case 'string': method = 'string'; break;
