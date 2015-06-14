@@ -27,6 +27,7 @@ var path = require('path');
 var mockApi = require('swagger-mock-api');
 
 module.exports = function(grunt) {
+
   grunt.initConfig({
     connect: {
       server: {
@@ -34,9 +35,7 @@ module.exports = function(grunt) {
           keepalive: true,
           middleware: [
             mockApi({
-                  yamlPath: path.join(__dirname, 'path to yaml file')
-                  // OR:
-                  // jsonPath: path.join(__dirname, 'path to yaml file')
+                  swaggerFile: path.join(__dirname, 'path to swagger YAML or JSON file')
               })
           ],
         },
@@ -44,10 +43,12 @@ module.exports = function(grunt) {
     },
   });
 
+
   grunt.loadNpmTasks('grunt-contrib-connect');
 
   grunt.registerTask('default', ['connect']);
 };
+
 
 ```
 
@@ -88,9 +89,10 @@ definitions:
               max: 1000
 ```
 
+## A note on types:
+
+All of the primitive types defined in the [Swagger specification](https://github.com/swagger-api/swagger-spec/blob/master/versions/2.0.md#data-types) are supported except for `file` and `password`.  Currently, the `format` property is ignored; use `x-chance-type` instead.  The server will error on any request with a type other than one of the primitive types if there is no valid x-chance-type also defined.
 
 ## Todos:
 
-* Test with more complex swagger files
 * Actual unit tests
-* Convert code to utilize ES6 features and clean up codebase
