@@ -59,7 +59,7 @@ function generateResponse(potentialResponses, pk) {
       // catch(e) {console.log(e);}
       return {
         v: function () {
-          return (0, _MockData2['default'])(responseSchema);
+          return _MockData2['default'](responseSchema);
         }
       };
     }
@@ -79,7 +79,7 @@ function generateResponse(potentialResponses, pk) {
 
   if (potentialResponses['default']) {
     return function () {
-      return (0, _MockData2['default'])(potentialResponses['default']);
+      return _MockData2['default'](potentialResponses['default']);
     };
   }
 }

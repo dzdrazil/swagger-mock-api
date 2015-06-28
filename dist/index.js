@@ -14,15 +14,32 @@ var _ConfigureRouter = require('./ConfigureRouter');
 
 var _ConfigureRouter2 = _interopRequireDefault(_ConfigureRouter);
 
+var _PrunePaths = require('./PrunePaths');
+
+var _PrunePaths2 = _interopRequireDefault(_PrunePaths);
+
 module.exports = function (config) {
   var router = undefined;
   var basePath = undefined;
+  if (!config.swaggerFile) {
+    throw new Error('Config is missing `swaggerFile` parameter');
+  }
 
-  _swaggerParser2['default'].parse(config.swaggerFile, function (err, api, metadata) {
+  if (config.ignorePaths && config.mockRoutes) {
+    throw new Error('Cannot specify both ignorePaths and mockPaths in config');
+  }
+
+  _swaggerParser2['default'].parse(config.swaggerFile, function (err, api) {
     if (err) throw err;
 
+    if (config.ignorePaths) {
+      api.paths = _PrunePaths2['default'](api.paths, config.ignorePaths);
+    } else if (config.mockPaths) {
+      api.paths = _PrunePaths2['default'](api.paths, config.mockPaths, true);
+    }
+
     basePath = api.basePath || '';
-    router = (0, _ConfigureRouter2['default'])(api.paths);
+    router = _ConfigureRouter2['default'](api.paths);
   });
 
   return function (req, res, next) {
