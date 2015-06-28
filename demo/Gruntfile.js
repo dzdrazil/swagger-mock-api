@@ -12,7 +12,24 @@ module.exports = function(grunt) {
           keepalive: true,
           middleware: [
             mockApi({
-                  swaggerFile: path.join(__dirname, './test.yaml')
+                  swaggerFile: path.join(__dirname, './test.yaml'),
+                  //
+                  // Example ways to ignore paths (i.e. to allow proxying to a live server)
+                  //
+                  ignorePaths: [
+                  //
+                    'GET /pets/{id}', // ignore specific methods in a path
+                  //
+                     '/pets' // ignore the entire path
+                  //
+                  ]
+                  //
+                  // Alternatively, specify ONLY the paths you want mocked:
+                  //
+                  // mockPaths: [
+                  //   '/pets/{id}', // all methods
+                  //   'GET DELETE /pets' // only specific methods
+                  // ]
               })
           ],
         },

@@ -1,24 +1,35 @@
-'use strict';
-
 import url from 'url';
 import parser from 'swagger-parser';
 
 import ConfigureRouter from './ConfigureRouter';
+import PrunePaths from './PrunePaths';
 
 module.exports = function(config) {
   let router;
   let basePath;
+  if (!config.swaggerFile) {
+    throw new Error('Config is missing `swaggerFile` parameter');
+  }
 
-  parser.parse(config.swaggerFile, function(err, api, metadata) {
+  if (config.ignorePaths && config.mockRoutes) {
+    throw new Error('Cannot specify both ignorePaths and mockPaths in config');
+  }
+
+  parser.parse(config.swaggerFile, function(err, api) {
     if (err) throw err;
+
+    if (config.ignorePaths) {
+      api.paths = PrunePaths(api.paths, config.ignorePaths);
+    } else if (config.mockPaths) {
+      api.paths = PrunePaths(api.paths, config.mockPaths, true);
+    }
 
     basePath = api.basePath || '';
     router = ConfigureRouter(api.paths);
   });
 
-
   return function(req, res, next) {
-    let method = req.method.toLowerCase();
+    const method = req.method.toLowerCase();
 
     let path = url.parse(req.url).pathname;
     path = path.replace(basePath + '/', '');
@@ -27,14 +38,14 @@ module.exports = function(config) {
     }
 
     console.log('Request: %s %s', req.method, path);
-    let matchingRoute = router.match('/' + method + path);
+    const matchingRoute = router.match('/' + method + path);
 
     if (!matchingRoute) return next();
 
     res.setHeader('Content-Type', 'application/json');
-    let response = matchingRoute.fn();
+    const response = matchingRoute.fn();
 
     res.write(response !== null ? JSON.stringify(response) : '');
     res.end();
   };
-}
+};
