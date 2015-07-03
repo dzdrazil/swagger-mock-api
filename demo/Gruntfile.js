@@ -18,9 +18,9 @@ module.exports = function(grunt) {
                   //
                   ignorePaths: [
                   //
-                    'GET /pets/{id}', // ignore specific methods in a path
+                  //  'GET /pets/{id}', // ignore specific methods in a path
                   //
-                     '/pets' // ignore the entire path
+                  //   '/pets' // ignore the entire path
                   //
                   ]
                   //

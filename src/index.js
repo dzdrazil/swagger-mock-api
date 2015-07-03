@@ -5,8 +5,6 @@ import ConfigureRouter from './ConfigureRouter';
 import PrunePaths from './PrunePaths';
 
 module.exports = function(config) {
-  let router;
-  let basePath;
   if (!config.swaggerFile) {
     throw new Error('Config is missing `swaggerFile` parameter');
   }
@@ -15,37 +13,45 @@ module.exports = function(config) {
     throw new Error('Cannot specify both ignorePaths and mockPaths in config');
   }
 
-  parser.parse(config.swaggerFile, function(err, api) {
-    if (err) throw err;
+  let basePath;
+  let router;
 
-    if (config.ignorePaths) {
-      api.paths = PrunePaths(api.paths, config.ignorePaths);
-    } else if (config.mockPaths) {
-      api.paths = PrunePaths(api.paths, config.mockPaths, true);
-    }
+  let parserPromise = new Promise((resolve) => {
+    parser.parse(config.swaggerFile, function(err, api) {
+      if (err) throw err;
 
-    basePath = api.basePath || '';
-    router = ConfigureRouter(api.paths);
+      if (config.ignorePaths) {
+        api.paths = PrunePaths(api.paths, config.ignorePaths);
+      } else if (config.mockPaths) {
+        api.paths = PrunePaths(api.paths, config.mockPaths, true);
+      }
+
+      basePath = api.basePath || '';
+      router = ConfigureRouter(api.paths);
+      resolve();
+    });
   });
 
   return function(req, res, next) {
-    const method = req.method.toLowerCase();
+    parserPromise.then(() => {
+      const method = req.method.toLowerCase();
 
-    let path = url.parse(req.url).pathname;
-    path = path.replace(basePath + '/', '');
-    if (path.charAt(0) !== '/') {
-      path = '/' + path;
-    }
+      let path = url.parse(req.url).pathname;
+      path = path.replace(basePath + '/', '');
+      if (path.charAt(0) !== '/') {
+        path = '/' + path;
+      }
 
-    console.log('Request: %s %s', req.method, path);
-    const matchingRoute = router.match('/' + method + path);
+      console.log('Request: %s %s', req.method, path);
+      const matchingRoute = router.match('/' + method + path);
 
-    if (!matchingRoute) return next();
+      if (!matchingRoute) return next();
 
-    res.setHeader('Content-Type', 'application/json');
-    const response = matchingRoute.fn();
+      res.setHeader('Content-Type', 'application/json');
+      const response = matchingRoute.fn();
 
-    res.write(response !== null ? JSON.stringify(response) : '');
-    res.end();
+      res.write(response !== null ? JSON.stringify(response) : '');
+      res.end();
+    });
   };
 };

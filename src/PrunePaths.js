@@ -1,3 +1,4 @@
+/* eslint no-loop-func:0*/
 export default function PrunePaths(paths, passthroughPaths, keep) {
   let replacement = {};
 
@@ -8,10 +9,11 @@ export default function PrunePaths(paths, passthroughPaths, keep) {
     if (methods.length) {
       methods = methods.map(x => x.toLowerCase());
       methods.forEach(m => {
-        if (keep) {
-          replacement[path]
-            ? (replacement[path][m] = paths[path][m])
-            : ((replacement[path] = {}) && (replacement[path][m] = paths[path][m]));
+        if (keep && replacement[path]) {
+          replacement[path][m] = paths[path][m];
+        } else if (keep) {
+          replacement[path] = replacement[path] || {};
+          replacement[path][m] = paths[path][m];
         } else {
           delete paths[path][m];
         }
