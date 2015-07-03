@@ -1,3 +1,4 @@
+/* eslint no-loop-func:0*/
 'use strict';
 
 exports.__esModule = true;
@@ -20,8 +21,11 @@ function PrunePaths(paths, passthroughPaths, keep) {
         return x.toLowerCase();
       });
       methods.forEach(function (m) {
-        if (keep) {
-          replacement[path] ? replacement[path][m] = paths[path][m] : (replacement[path] = {}) && (replacement[path][m] = paths[path][m]);
+        if (keep && replacement[path]) {
+          replacement[path][m] = paths[path][m];
+        } else if (keep) {
+          replacement[path] = replacement[path] || {};
+          replacement[path][m] = paths[path][m];
         } else {
           delete paths[path][m];
         }

@@ -1,5 +1,7 @@
 'use strict';
 
+var _Promise = require('babel-runtime/core-js/promise')['default'];
+
 var _interopRequireDefault = require('babel-runtime/helpers/interop-require-default')['default'];
 
 var _url = require('url');
@@ -19,8 +21,6 @@ var _PrunePaths = require('./PrunePaths');
 var _PrunePaths2 = _interopRequireDefault(_PrunePaths);
 
 module.exports = function (config) {
-  var router = undefined;
-  var basePath = undefined;
   if (!config.swaggerFile) {
     throw new Error('Config is missing `swaggerFile` parameter');
   }
@@ -29,37 +29,44 @@ module.exports = function (config) {
     throw new Error('Cannot specify both ignorePaths and mockPaths in config');
   }
 
-  _swaggerParser2['default'].parse(config.swaggerFile, function (err, api) {
-    if (err) throw err;
+  var basePath = undefined;
+  var router = undefined;
+  var parserPromise = new _Promise(function (resolve) {
+    _swaggerParser2['default'].parse(config.swaggerFile, function (err, api) {
+      if (err) throw err;
 
-    if (config.ignorePaths) {
-      api.paths = _PrunePaths2['default'](api.paths, config.ignorePaths);
-    } else if (config.mockPaths) {
-      api.paths = _PrunePaths2['default'](api.paths, config.mockPaths, true);
-    }
+      if (config.ignorePaths) {
+        api.paths = _PrunePaths2['default'](api.paths, config.ignorePaths);
+      } else if (config.mockPaths) {
+        api.paths = _PrunePaths2['default'](api.paths, config.mockPaths, true);
+      }
 
-    basePath = api.basePath || '';
-    router = _ConfigureRouter2['default'](api.paths);
+      basePath = api.basePath || '';
+      router = _ConfigureRouter2['default'](api.paths);
+      resolve();
+    });
   });
 
   return function (req, res, next) {
-    var method = req.method.toLowerCase();
+    parserPromise.then(function () {
+      var method = req.method.toLowerCase();
 
-    var path = _url2['default'].parse(req.url).pathname;
-    path = path.replace(basePath + '/', '');
-    if (path.charAt(0) !== '/') {
-      path = '/' + path;
-    }
+      var path = _url2['default'].parse(req.url).pathname;
+      path = path.replace(basePath + '/', '');
+      if (path.charAt(0) !== '/') {
+        path = '/' + path;
+      }
 
-    console.log('Request: %s %s', req.method, path);
-    var matchingRoute = router.match('/' + method + path);
+      console.log('Request: %s %s', req.method, path);
+      var matchingRoute = router.match('/' + method + path);
 
-    if (!matchingRoute) return next();
+      if (!matchingRoute) return next();
 
-    res.setHeader('Content-Type', 'application/json');
-    var response = matchingRoute.fn();
+      res.setHeader('Content-Type', 'application/json');
+      var response = matchingRoute.fn();
 
-    res.write(response !== null ? JSON.stringify(response) : '');
-    res.end();
+      res.write(response !== null ? JSON.stringify(response) : '');
+      res.end();
+    });
   };
 };
