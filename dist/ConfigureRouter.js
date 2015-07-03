@@ -13,14 +13,54 @@ var _MockData = require('./MockData');
 
 var _MockData2 = _interopRequireDefault(_MockData);
 
+function correctPath(path) {
+  var uri = path.replace(/^\/?|\/?$/, '');
+  var segments = uri.split('/');
+
+  return '/' + segments.map(function (s) {
+    var segment = s;
+    if (segment.charAt(0) === '{' && segment.charAt(segment.length - 1) === '}') {
+      segment = segment.slice(1, -1);
+      return ':' + segment;
+    }
+
+    return segment;
+  }).join('/');
+}
+
+// wrapped MockData to satisfy eslint's no funciton definitions inside of loops
+function mock(schema) {
+  return _MockData2['default'](schema);
+}
+
+function generateResponse(potentialResponses) {
+  for (var k in potentialResponses) {
+    if (k === 'default') continue;
+
+    var responseSchema = potentialResponses[k];
+    var responseCode = parseInt(k, 10);
+    if (responseCode > 199 && responseCode < 300) {
+      return mock.bind(null, responseSchema);
+    }
+  }
+
+  if (potentialResponses['default']) {
+    return mock.bind(null, potentialResponses['default']);
+  }
+}
+
 function ConfigureRouter(paths) {
   var router = new _routes2['default']();
 
   for (var pk in paths) {
+    if (!paths.hasOwnProperty(pk)) continue;
+
     var path = paths[pk];
     var route = correctPath(pk);
 
     for (var mk in path) {
+      if (!path.hasOwnProperty(mk)) continue;
+
       var method = path[mk];
       console.log('ADDING ROUTE: ', mk.toUpperCase() + ' ' + pk);
 
@@ -32,55 +72,4 @@ function ConfigureRouter(paths) {
   return router;
 }
 
-function correctPath(path) {
-  var uri = path.replace(/^\/?|\/?$/, '');
-  var segments = uri.split('/');
-
-  return '/' + segments.map(function (s) {
-    if (s.charAt(0) === '{' && s.charAt(s.length - 1) === '}') {
-      s = s.slice(1, -1);
-      return ':' + s;
-    }
-
-    return s;
-  }).join('/');
-}
-
-function generateResponse(potentialResponses, pk) {
-  var _loop = function (k) {
-    if (k === 'default') return 'continue';
-
-    var responseSchema = potentialResponses[k];
-
-    if (parseInt(k) < 300) {
-      // console.log('----------------------');
-      // console.log(pk);
-      // try {console.log(MockData(responseSchema)); }
-      // catch(e) {console.log(e);}
-      return {
-        v: function () {
-          return _MockData2['default'](responseSchema);
-        }
-      };
-    }
-  };
-
-  for (var k in potentialResponses) {
-    var _ret = _loop(k);
-
-    switch (_ret) {
-      case 'continue':
-        continue;
-
-      default:
-        if (typeof _ret === 'object') return _ret.v;
-    }
-  }
-
-  if (potentialResponses['default']) {
-    return function () {
-      return _MockData2['default'](potentialResponses['default']);
-    };
-  }
-}
 module.exports = exports['default'];

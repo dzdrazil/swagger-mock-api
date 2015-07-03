@@ -31,6 +31,7 @@ module.exports = function (config) {
 
   var basePath = undefined;
   var router = undefined;
+
   var parserPromise = new _Promise(function (resolve) {
     _swaggerParser2['default'].parse(config.swaggerFile, function (err, api) {
       if (err) throw err;
