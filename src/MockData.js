@@ -71,8 +71,10 @@ function swaggerToChance(typedef) {
   else {
     return generateObject(typedef);
   }
+
+  method = mapToChance(method);
   if (typedef['x-type-options']) {
-   return chance[method](typedef['x-type-options']);
+    return chance[method](typedef['x-type-options']);
   } else {
     return chance[method]();
   }
@@ -97,8 +99,7 @@ function mapToChance(type) {
          method = type;
          break;
       }
-      console.log('unfound type!');
-      console.log(type);
+      console.log('unfound type:', type);
       throw new Error('No chance equivalent for type: ' + type);
   }
   return method;

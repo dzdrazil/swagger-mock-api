@@ -47,10 +47,15 @@ module.exports = function(config) {
 
       if (!matchingRoute) return next();
 
-      res.setHeader('Content-Type', 'application/json');
-      const response = matchingRoute.fn();
+      try {
+        const response = matchingRoute.fn();
+        res.setHeader('Content-Type', 'application/json');
+        res.write(response !== null ? JSON.stringify(response) : '');
+      } catch(e) {
+        res.statusCode = 500;
+        res.write(JSON.stringify({message: e.message}));
+      }
 
-      res.write(response !== null ? JSON.stringify(response) : '');
       res.end();
     });
   };

@@ -31,18 +31,19 @@ module.exports = function (config) {
 
   var basePath = undefined;
   var router = undefined;
+
   var parserPromise = new _Promise(function (resolve) {
     _swaggerParser2['default'].parse(config.swaggerFile, function (err, api) {
       if (err) throw err;
 
       if (config.ignorePaths) {
-        api.paths = _PrunePaths2['default'](api.paths, config.ignorePaths);
+        api.paths = (0, _PrunePaths2['default'])(api.paths, config.ignorePaths);
       } else if (config.mockPaths) {
-        api.paths = _PrunePaths2['default'](api.paths, config.mockPaths, true);
+        api.paths = (0, _PrunePaths2['default'])(api.paths, config.mockPaths, true);
       }
 
       basePath = api.basePath || '';
-      router = _ConfigureRouter2['default'](api.paths);
+      router = (0, _ConfigureRouter2['default'])(api.paths);
       resolve();
     });
   });
@@ -62,10 +63,15 @@ module.exports = function (config) {
 
       if (!matchingRoute) return next();
 
-      res.setHeader('Content-Type', 'application/json');
-      var response = matchingRoute.fn();
+      try {
+        var response = matchingRoute.fn();
+        res.setHeader('Content-Type', 'application/json');
+        res.write(response !== null ? JSON.stringify(response) : '');
+      } catch (e) {
+        res.statusCode = 500;
+        res.write(JSON.stringify({ message: e.message }));
+      }
 
-      res.write(response !== null ? JSON.stringify(response) : '');
       res.end();
     });
   };
