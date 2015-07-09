@@ -30,7 +30,7 @@ function correctPath(path) {
 
 // wrapped MockData to satisfy eslint's no funciton definitions inside of loops
 function mock(schema) {
-  return _MockData2['default'](schema);
+  return (0, _MockData2['default'])(schema);
 }
 
 function generateResponse(potentialResponses) {
