@@ -60,10 +60,11 @@ module.exports = function (config) {
       path = '/' + path;
     }
 
-    debug('Request: %s %s', req.method, path);
     var matchingRoute = router.match('/' + method + path);
 
     if (!matchingRoute) return next();
+    
+    debug('Request: %s %s', req.method, path);
 
     res.setHeader('Content-Type', 'application/json');
     var response = matchingRoute.fn();
