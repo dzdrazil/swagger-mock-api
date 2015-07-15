@@ -1,6 +1,6 @@
 {
   "name": "swagger-mock-api",
-  "version": "1.4.0",
+  "version": "1.4.1",
   "description": "Creates a connect middleware mock API from a Swagger 2.0 YAML file",
   "main": "dist/index.js",
   "repository": {

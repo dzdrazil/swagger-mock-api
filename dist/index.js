@@ -58,10 +58,13 @@ module.exports = function (config) {
         path = '/' + path;
       }
 
-      console.log('Request: %s %s', req.method, path);
       var matchingRoute = router.match('/' + method + path);
 
       if (!matchingRoute) return next();
+
+      if (process.env.debug) {
+        console.log('Request: %s %s', req.method, path);
+      }
 
       try {
         var response = matchingRoute.fn();
