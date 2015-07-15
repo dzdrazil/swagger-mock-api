@@ -53,7 +53,10 @@ export default function ConfigureRouter(paths) {
       if (!path.hasOwnProperty(mk)) continue;
 
       let method = path[mk];
-      console.log('ADDING ROUTE: ', mk.toUpperCase() + ' ' + pk);
+
+      if (process.env.debug) {
+        console.log('ADDING ROUTE: ', mk.toUpperCase() + ' ' + pk);
+      }
 
       let respond = generateResponse(method.responses, pk);
       router.addRoute('/' + mk + route, respond);
