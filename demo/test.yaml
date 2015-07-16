@@ -123,6 +123,12 @@ definitions:
             x-type-options:
               min: 1
               max: 1000
+          # demo of a fixed type value
+          status:
+            type: object
+            x-chance-type: fixed
+            x-type-value:
+              type: 'adopted'
 
   NewPet:
     required:

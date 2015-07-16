@@ -62,7 +62,10 @@ function ConfigureRouter(paths) {
       if (!path.hasOwnProperty(mk)) continue;
 
       var method = path[mk];
-      console.log('ADDING ROUTE: ', mk.toUpperCase() + ' ' + pk);
+
+      if (process.env.debug) {
+        console.log('ADDING ROUTE: ', mk.toUpperCase() + ' ' + pk);
+      }
 
       var respond = generateResponse(method.responses, pk);
       router.addRoute('/' + mk + route, respond);
