@@ -13,6 +13,7 @@ module.exports = function(grunt) {
           middleware: [
             mockApi({
                   swaggerFile: path.join(__dirname, './test.yaml'),
+                  watch: true,
                   //
                   // Example ways to ignore paths (i.e. to allow proxying to a live server)
                   //

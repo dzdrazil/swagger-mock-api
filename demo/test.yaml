@@ -122,7 +122,13 @@ definitions:
             format: int64
             x-type-options:
               min: 1
-              max: 1000
+              max: 1000000
+          # demo of a fixed type value
+          status:
+            type: object
+            x-chance-type: fixed
+            x-type-value:
+              type: 'adopted'
 
   NewPet:
     required:

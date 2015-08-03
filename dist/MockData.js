@@ -84,6 +84,10 @@ function swaggerToChance(typedef) {
     return generateObject(typedef);
   }
 
+  if (method === 'fixed') {
+    return typedef['x-type-value'];
+  }
+
   method = mapToChance(method);
   if (typedef['x-type-options']) {
     return chance[method](typedef['x-type-options']);

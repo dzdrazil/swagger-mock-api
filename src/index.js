@@ -1,4 +1,6 @@
 import url from 'url';
+import fs from 'fs';
+
 import parser from 'swagger-parser';
 
 import ConfigureRouter from './ConfigureRouter';
@@ -20,17 +22,31 @@ module.exports = function(config) {
     parser.parse(config.swaggerFile, function(err, api) {
       if (err) throw err;
 
-      if (config.ignorePaths) {
-        api.paths = PrunePaths(api.paths, config.ignorePaths);
-      } else if (config.mockPaths) {
-        api.paths = PrunePaths(api.paths, config.mockPaths, true);
-      }
-
-      basePath = api.basePath || '';
-      router = ConfigureRouter(api.paths);
+      init(api);
       resolve();
     });
   });
+
+  if (config.watch) {
+    fs.watchFile(config.swaggerFile, function() {
+      parser.parse(config.swaggerFile, function(err, api) {
+        if (err) throw err;
+
+        init(api);
+      });
+    });
+  }
+
+  function init(api) {
+    if (config.ignorePaths) {
+      api.paths = PrunePaths(api.paths, config.ignorePaths);
+    } else if (config.mockPaths) {
+      api.paths = PrunePaths(api.paths, config.mockPaths, true);
+    }
+
+    basePath = api.basePath || '';
+    router = ConfigureRouter(api.paths);
+  }
 
   return function(req, res, next) {
     parserPromise.then(() => {

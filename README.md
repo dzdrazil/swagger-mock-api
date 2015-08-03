@@ -5,9 +5,10 @@ This module is a connect-compatible middleware generating function that generate
 - [mock-api](#)
   - [installation](#)
   - [Using the middleware](#)
-    - [Ignoring specific paths](#)
+    + [Ignoring specific paths](#)
   - [Specifying custom Chance options](#)
   - [A note on types:](#)
+    + [Returning Fixed values](#)
 
 ## installation
 
@@ -42,7 +43,8 @@ module.exports = function(grunt) {
           keepalive: true,
           middleware: [
             mockApi({
-                  swaggerFile: path.join(__dirname, 'path to swagger YAML or JSON file')
+                  swaggerFile: path.join(__dirname, 'path to swagger YAML or JSON file'),
+                  watch: true // enable reloading the routes and schemas when the swagger file changes
               })
           ],
         },
@@ -115,3 +117,15 @@ definitions:
 ## A note on types:
 
 All of the primitive types defined in the [Swagger specification](https://github.com/swagger-api/swagger-spec/blob/master/versions/2.0.md#data-types) are supported except for `file` and `password`.  Currently, the `format` property is ignored; use `x-chance-type` instead.  The server will error on any request with a type other than one of the primitive types if there is no valid x-chance-type also defined.
+
+### Returning Fixed Values
+
+Although not a chance method, support has been added for returning fixed values using `x-chance-type: fixed`.  Any value given for the custom tag `x-type-value` will be returned; below is an example where an object is returned:
+
+```yaml
+    status:
+      type: object
+      x-chance-type: fixed
+      x-type-value:
+        type: 'adopted'
+```
