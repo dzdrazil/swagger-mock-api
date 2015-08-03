@@ -8,6 +8,10 @@ var _url = require('url');
 
 var _url2 = _interopRequireDefault(_url);
 
+var _fs = require('fs');
+
+var _fs2 = _interopRequireDefault(_fs);
+
 var _swaggerParser = require('swagger-parser');
 
 var _swaggerParser2 = _interopRequireDefault(_swaggerParser);
@@ -36,17 +40,31 @@ module.exports = function (config) {
     _swaggerParser2['default'].parse(config.swaggerFile, function (err, api) {
       if (err) throw err;
 
-      if (config.ignorePaths) {
-        api.paths = (0, _PrunePaths2['default'])(api.paths, config.ignorePaths);
-      } else if (config.mockPaths) {
-        api.paths = (0, _PrunePaths2['default'])(api.paths, config.mockPaths, true);
-      }
-
-      basePath = api.basePath || '';
-      router = (0, _ConfigureRouter2['default'])(api.paths);
+      init(api);
       resolve();
     });
   });
+
+  if (config.watch) {
+    _fs2['default'].watchFile(config.swaggerFile, function () {
+      _swaggerParser2['default'].parse(config.swaggerFile, function (err, api) {
+        if (err) throw err;
+
+        init(api);
+      });
+    });
+  }
+
+  function init(api) {
+    if (config.ignorePaths) {
+      api.paths = (0, _PrunePaths2['default'])(api.paths, config.ignorePaths);
+    } else if (config.mockPaths) {
+      api.paths = (0, _PrunePaths2['default'])(api.paths, config.mockPaths, true);
+    }
+
+    basePath = api.basePath || '';
+    router = (0, _ConfigureRouter2['default'])(api.paths);
+  }
 
   return function (req, res, next) {
     parserPromise.then(function () {

@@ -43,7 +43,8 @@ module.exports = function(grunt) {
           keepalive: true,
           middleware: [
             mockApi({
-                  swaggerFile: path.join(__dirname, 'path to swagger YAML or JSON file')
+                  swaggerFile: path.join(__dirname, 'path to swagger YAML or JSON file'),
+                  watch: true // enable reloading the routes and schemas when the swagger file changes
               })
           ],
         },
