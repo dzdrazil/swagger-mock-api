@@ -6,7 +6,7 @@ import parser from 'swagger-parser';
 import ConfigureRouter from './ConfigureRouter';
 import PrunePaths from './PrunePaths';
 
-module.exports = function(config) {
+export default function(config) {
   if (!config.swaggerFile) {
     throw new Error('Config is missing `swaggerFile` parameter');
   }
@@ -72,7 +72,7 @@ module.exports = function(config) {
         res.write(response !== null ? JSON.stringify(response) : '');
       } catch(e) {
         res.statusCode = 500;
-        res.write(JSON.stringify({message: e.message}));
+        res.write(JSON.stringify({message: e.message}, null, 4));
       }
 
       res.end();

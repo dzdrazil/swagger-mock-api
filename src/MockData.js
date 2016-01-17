@@ -6,83 +6,12 @@ import hoek from 'hoek';
 const chance = new Chance();
 
 export default function MockData(definition) {
-    let schema = definition.schema;
+  let schema = definition.schema;
 
-    if (!schema) return null;
+  if (!schema) return null;
 
-    if (schema.type === 'array') {
-        return generateArray(schema);
-    } else {
-        return generateObject(schema);
-    }
+  return generateSchema(schema);
 };
-
-function generateArray(def) {
-  let schema = hoek.clone(def);
-  if (schema.items.allOf) {
-    schema.items = schema.items.allOf.reduce((acc, def) => {
-      return hoek.merge(acc, def);
-    }, {});
-  }
-  let options = hoek.merge({min: 0, max: 10}, schema['x-type-options']);
-  let iterations = chance.integer(options);
-  let ret = [];
-  let method;
-
-  if (schema.type && !schema.type.type) { // schema.type.type indicates that type is a param key, not swagger type
-    method = swaggerToChance;
-  } else {
-    method = generateObject;
-  }
-  for (let i = 0; i < iterations; i++) {
-    ret.push(method(schema.items));
-  }
-
-  return ret;
-}
-
-function generateObject(def) {
-  let ret = {};
-  let schema = hoek.clone(def);
-  if (schema.properties) {
-    schema = schema.properties;
-  }
-
-  for (let k in schema) {
-    if (schema[k].type === 'array') {
-      ret[k] = generateArray(schema[k]);
-      continue;
-    }
-
-    ret[k] = swaggerToChance(schema[k]);
-  }
-  return ret;
-}
-
-function swaggerToChance(typedef) {
-  let method;
-  if (typedef['x-chance-type']) {
-    method = typedef['x-chance-type'];
-  } else if (typedef.type === 'array') {
-    return generateArray(typedef);
-  } else if (typedef.type) {
-    method = mapToChance(typedef.type, typedef);
-  }
-  else {
-    return generateObject(typedef);
-  }
-
-  if (method === 'fixed') {
-    return typedef['x-type-value'];
-  }
-
-  method = mapToChance(method);
-  if (typedef['x-type-options']) {
-    return chance[method](typedef['x-type-options']);
-  } else {
-    return chance[method]();
-  }
-}
 
 function mapToChance(type) {
   let method;
@@ -107,4 +36,60 @@ function mapToChance(type) {
       throw new Error('No chance equivalent for type: ' + type);
   }
   return method;
+}
+
+function generateSchema(definition) {
+  if (definition.items) {
+    return generateArray(definition);
+  }
+
+  // if (definition.type === 'object' && !definition.properties) {
+  //   return {};
+  // }
+
+  if (definition.properties) {
+    return generateObject(definition);
+  }
+
+  if (definition.allOf) {
+    return definition.allOf
+      .reduce((s, o) => Object.assign(s, generateSchema(o)), {});
+  }
+
+  let type = definition['x-chance-type'] || definition.type;
+
+  if (type === 'fixed') {
+    return definition['x-type-value'];
+  }
+
+  return definition['x-type-options']
+    ? chance[mapToChance(type)](definition['x-type-options'])
+    : chance[mapToChance(type)]();
+}
+
+function generateArray(schema) {
+  let items = schema.items;
+  let options = schema.options || {min: 0, max: 10};
+  let iterations = chance.integer(options);
+
+
+  let ret = [];
+  for (let i = 0; i < iterations; i++) {
+    ret.push(generateSchema(items));
+  }
+
+  return ret;
+}
+
+function generateObject(definition) {
+  let ret = {};
+  let schema = hoek.clone(definition);
+  if (schema.properties) {
+    schema = schema.properties;
+  }
+
+  for (let k in schema) {
+    ret[k] = generateSchema(schema[k]);
+  }
+  return ret;
 }
