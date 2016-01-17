@@ -4,6 +4,8 @@ var _Promise = require('babel-runtime/core-js/promise')['default'];
 
 var _interopRequireDefault = require('babel-runtime/helpers/interop-require-default')['default'];
 
+exports.__esModule = true;
+
 var _url = require('url');
 
 var _url2 = _interopRequireDefault(_url);
@@ -24,7 +26,7 @@ var _PrunePaths = require('./PrunePaths');
 
 var _PrunePaths2 = _interopRequireDefault(_PrunePaths);
 
-module.exports = function (config) {
+exports['default'] = function (config) {
   if (!config.swaggerFile) {
     throw new Error('Config is missing `swaggerFile` parameter');
   }
@@ -57,13 +59,13 @@ module.exports = function (config) {
 
   function init(api) {
     if (config.ignorePaths) {
-      api.paths = (0, _PrunePaths2['default'])(api.paths, config.ignorePaths);
+      api.paths = _PrunePaths2['default'](api.paths, config.ignorePaths);
     } else if (config.mockPaths) {
-      api.paths = (0, _PrunePaths2['default'])(api.paths, config.mockPaths, true);
+      api.paths = _PrunePaths2['default'](api.paths, config.mockPaths, true);
     }
 
     basePath = api.basePath || '';
-    router = (0, _ConfigureRouter2['default'])(api.paths);
+    router = _ConfigureRouter2['default'](api.paths);
   }
 
   return function (req, res, next) {
@@ -90,10 +92,13 @@ module.exports = function (config) {
         res.write(response !== null ? JSON.stringify(response) : '');
       } catch (e) {
         res.statusCode = 500;
-        res.write(JSON.stringify({ message: e.message }));
+        res.write(JSON.stringify({ message: e.message }, null, 4));
       }
 
       res.end();
     });
   };
 };
+
+;
+module.exports = exports['default'];

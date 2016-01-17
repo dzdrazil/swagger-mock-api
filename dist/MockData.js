@@ -1,5 +1,7 @@
 'use strict';
 
+var _Object$assign = require('babel-runtime/core-js/object/assign')['default'];
+
 var _interopRequireDefault = require('babel-runtime/helpers/interop-require-default')['default'];
 
 exports.__esModule = true;
@@ -20,81 +22,10 @@ function MockData(definition) {
 
   if (!schema) return null;
 
-  if (schema.type === 'array') {
-    return generateArray(schema);
-  } else {
-    return generateObject(schema);
-  }
+  return generateSchema(schema);
 }
 
 ;
-
-function generateArray(def) {
-  var schema = _hoek2['default'].clone(def);
-  if (schema.items.allOf) {
-    schema.items = schema.items.allOf.reduce(function (acc, def) {
-      return _hoek2['default'].merge(acc, def);
-    }, {});
-  }
-  var options = _hoek2['default'].merge({ min: 0, max: 10 }, schema['x-type-options']);
-  var iterations = chance.integer(options);
-  var ret = [];
-  var method = undefined;
-
-  if (schema.type && !schema.type.type) {
-    // schema.type.type indicates that type is a param key, not swagger type
-    method = swaggerToChance;
-  } else {
-    method = generateObject;
-  }
-  for (var i = 0; i < iterations; i++) {
-    ret.push(method(schema.items));
-  }
-
-  return ret;
-}
-
-function generateObject(def) {
-  var ret = {};
-  var schema = _hoek2['default'].clone(def);
-  if (schema.properties) {
-    schema = schema.properties;
-  }
-
-  for (var k in schema) {
-    if (schema[k].type === 'array') {
-      ret[k] = generateArray(schema[k]);
-      continue;
-    }
-
-    ret[k] = swaggerToChance(schema[k]);
-  }
-  return ret;
-}
-
-function swaggerToChance(typedef) {
-  var method = undefined;
-  if (typedef['x-chance-type']) {
-    method = typedef['x-chance-type'];
-  } else if (typedef.type === 'array') {
-    return generateArray(typedef);
-  } else if (typedef.type) {
-    method = mapToChance(typedef.type, typedef);
-  } else {
-    return generateObject(typedef);
-  }
-
-  if (method === 'fixed') {
-    return typedef['x-type-value'];
-  }
-
-  method = mapToChance(method);
-  if (typedef['x-type-options']) {
-    return chance[method](typedef['x-type-options']);
-  } else {
-    return chance[method]();
-  }
-}
 
 function mapToChance(type) {
   var method = undefined;
@@ -129,5 +60,59 @@ function mapToChance(type) {
       throw new Error('No chance equivalent for type: ' + type);
   }
   return method;
+}
+
+function generateSchema(definition) {
+  if (definition.items) {
+    return generateArray(definition);
+  }
+
+  // if (definition.type === 'object' && !definition.properties) {
+  //   return {};
+  // }
+
+  if (definition.properties) {
+    return generateObject(definition);
+  }
+
+  if (definition.allOf) {
+    return definition.allOf.reduce(function (s, o) {
+      return _Object$assign(s, generateSchema(o));
+    }, {});
+  }
+
+  var type = definition['x-chance-type'] || definition.type;
+
+  if (type === 'fixed') {
+    return definition['x-type-value'];
+  }
+
+  return definition['x-type-options'] ? chance[mapToChance(type)](definition['x-type-options']) : chance[mapToChance(type)]();
+}
+
+function generateArray(schema) {
+  var items = schema.items;
+  var options = schema.options || { min: 0, max: 10 };
+  var iterations = chance.integer(options);
+
+  var ret = [];
+  for (var i = 0; i < iterations; i++) {
+    ret.push(generateSchema(items));
+  }
+
+  return ret;
+}
+
+function generateObject(definition) {
+  var ret = {};
+  var schema = _hoek2['default'].clone(definition);
+  if (schema.properties) {
+    schema = schema.properties;
+  }
+
+  for (var k in schema) {
+    ret[k] = generateSchema(schema[k]);
+  }
+  return ret;
 }
 module.exports = exports['default'];
