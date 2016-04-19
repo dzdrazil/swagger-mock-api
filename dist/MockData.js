@@ -92,7 +92,7 @@ function generateSchema(definition) {
 
 function generateArray(schema) {
   var items = schema.items;
-  var options = schema.options || { min: 0, max: 10 };
+  var options = schema['x-type-options'] || { min: 0, max: 10 };
   var iterations = chance.integer(options);
 
   var ret = [];
