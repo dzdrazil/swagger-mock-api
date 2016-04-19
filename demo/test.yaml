@@ -50,6 +50,9 @@ paths:
             type: array
             items:
               $ref: '#/definitions/Pet'
+            x-type-options:
+              min: 0
+              max: 10
         default:
           description: unexpected error
           schema:
