@@ -145,6 +145,10 @@ definitions:
       tag:
         type: string
         x-chance-type: guid
+      Kingdom:
+        type: string
+        minLength: 3
+        maxLength: 5
       age:
         type: integer
         multipleOf: 7

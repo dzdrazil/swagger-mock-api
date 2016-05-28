@@ -34,8 +34,11 @@ var StringParser = (function () {
     }, {
         key: 'parseString',
         value: function parseString(node) {
-            var chanceType = node['x-chance-type'] || 'string';
-            return chance[chanceType](node['x-type-options']);
+            var options = node['x-type-options'] || {};
+
+            if (node.maxLength && node.minLength) options.length = chance.integer({ max: node.maxLength, min: node.minLength });else options.length = options.length || node.maxLength || node.minLength;
+
+            return chance.string(options);
         }
     }]);
 
