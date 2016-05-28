@@ -1,6 +1,4 @@
 import Chance from 'chance';
-import hoek from 'hoek';
-
 const chance = new Chance();
 
 export default class ByteParser {

@@ -14,10 +14,6 @@ var _chance = require('chance');
 
 var _chance2 = _interopRequireDefault(_chance);
 
-var _hoek = require('hoek');
-
-var _hoek2 = _interopRequireDefault(_hoek);
-
 var chance = new _chance2['default']();
 
 var StringParser = (function () {
@@ -46,7 +42,8 @@ var StringParser = (function () {
     }, {
         key: 'parseEnum',
         value: function parseEnum(nodeEnum) {
-            return nodeEnum[Math.floor(Math.random() * nodeEnum.length)];
+            var index = chance.integer({ min: 0, max: nodeEnum.length - 1 });
+            return nodeEnum[index];
         }
     }]);
 

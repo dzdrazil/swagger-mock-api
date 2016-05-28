@@ -14,10 +14,6 @@ var _chance = require('chance');
 
 var _chance2 = _interopRequireDefault(_chance);
 
-var _hoek = require('hoek');
-
-var _hoek2 = _interopRequireDefault(_hoek);
-
 var chance = new _chance2['default']();
 
 var NumberParser = (function () {
@@ -33,7 +29,9 @@ var NumberParser = (function () {
     }, {
         key: 'parse',
         value: function parse(node) {
-            return chance.bool(node['x-type-options']);
+            if (this.isInteger(node)) return chance.integer(node['x-type-options']);
+
+            if (this.isFloating(node)) return chance.floating(node['x-type-options']);
         }
     }, {
         key: 'isInteger',

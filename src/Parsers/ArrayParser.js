@@ -1,5 +1,6 @@
 import Chance from 'chance';
 const chance = new Chance();
+
 export default class ArrayParser {
     constructor(parser) {
         this.parser = parser;
@@ -13,9 +14,9 @@ export default class ArrayParser {
         return this.generateArray(node);
     }
 
-    generateArray(schema) {
-        let items = schema.items;
-        var options = schema['x-type-options'] || { min: 0, max: 10 };
+    generateArray(node) {
+        let items = node.items;
+        var options = node['x-type-options'] || { min: 0, max: 10 };
         let iterations = chance.integer(options);
         let ret = [];
 

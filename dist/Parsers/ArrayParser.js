@@ -35,9 +35,9 @@ var ArrayParser = (function () {
         }
     }, {
         key: 'generateArray',
-        value: function generateArray(schema) {
-            var items = schema.items;
-            var options = schema['x-type-options'] || { min: 0, max: 10 };
+        value: function generateArray(node) {
+            var items = node.items;
+            var options = node['x-type-options'] || { min: 0, max: 10 };
             var iterations = chance.integer(options);
             var ret = [];
 

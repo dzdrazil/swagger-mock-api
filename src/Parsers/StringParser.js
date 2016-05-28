@@ -1,7 +1,6 @@
 import Chance from 'chance';
-import hoek from 'hoek';
-
 const chance = new Chance();
+
 export default class StringParser {
     canParse(node) {
         return node.type === 'string';
@@ -20,6 +19,7 @@ export default class StringParser {
     }
     
     parseEnum(nodeEnum) {
-        return nodeEnum[Math.floor(Math.random() * nodeEnum.length)];
+        let index = chance.integer({min: 0, max: nodeEnum.length - 1});
+        return nodeEnum[index];
     }
 }

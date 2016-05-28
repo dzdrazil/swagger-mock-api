@@ -14,10 +14,6 @@ var _chance = require('chance');
 
 var _chance2 = _interopRequireDefault(_chance);
 
-var _hoek = require('hoek');
-
-var _hoek2 = _interopRequireDefault(_hoek);
-
 var chance = new _chance2['default']();
 
 var BooleanParser = (function () {
