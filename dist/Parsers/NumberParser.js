@@ -50,9 +50,17 @@ var NumberParser = (function () {
                 throw new Error('The value of "multipleOf" MUST be a JSON number. This number MUST be strictly greater than 0.');
             }
 
+            if (node.maximum) {
+                bounds.max = node.maximum + (node.exclusiveMaximum ? -1 : 0);
+            }
+
+            if (node.minimum) {
+                bounds.min = node.minimum + (node.exclusiveMinimum ? 1 : 0);
+            }
+
             if (node.multipleOf) {
-                bounds.max = bounds.max / node.multipleOf;
                 bounds.min = bounds.min / node.multipleOf;
+                bounds.max = bounds.max / node.multipleOf;
             }
 
             return bounds;

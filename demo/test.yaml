@@ -148,9 +148,14 @@ definitions:
       age:
         type: integer
         multipleOf: 7
-        x-type-options:
-          min: -21
-          max: 21
+        minimum: 1
+        maximum: 21
+      weight:
+        type: integer
+        minimum: 3
+        exclusiveMinimum: false
+        maximum: 5
+        exclusiveMaximum: true
       size:
         type: integer
         enum:

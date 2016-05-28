@@ -28,11 +28,19 @@ export default class NumberParser {
             throw new Error(`The value of "multipleOf" MUST be a JSON number. This number MUST be strictly greater than 0.`);
         }
 
-        if (node.multipleOf) {
-                bounds.min = Math.floor(bounds.min + bounds.max) / node.multipleOf;
-                bounds.max = bounds.max / node.multipleOf;
+        if (node.maximum) {
+            bounds.max = node.maximum + (node.exclusiveMaximum ? -1 : 0);
         }
-        
+
+        if (node.minimum) {
+            bounds.min = node.minimum + (node.exclusiveMinimum ? 1 : 0);
+        }
+
+        if (node.multipleOf) {
+            bounds.min = bounds.min / node.multipleOf;
+            bounds.max = bounds.max / node.multipleOf;
+        }
+
         return bounds;
     }
 
