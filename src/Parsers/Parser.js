@@ -5,12 +5,14 @@ import NumberParser from './NumberParser'
 import DateParser from './DateParser'
 import BooleanParser from './BooleanParser'
 import AllOfParser from './AllOfParser'
+import EnumParser from './EnumParser'
 import Chance from 'chance';
 const chance = new Chance();
 
 export default class Parser {
     get parsers() {
         return this._parsers || (this._parsers = [
+            new EnumParser(),
             new StringParser(),
             new ObjectParser(this),
             new ArrayParser(this),
@@ -18,7 +20,7 @@ export default class Parser {
             new NumberParser(),
             new BooleanParser(),
             new DateParser(),
-            new BooleanParser()
+            new BooleanParser(),
         ]);
     }
 

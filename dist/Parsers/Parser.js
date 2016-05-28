@@ -38,6 +38,10 @@ var _AllOfParser = require('./AllOfParser');
 
 var _AllOfParser2 = _interopRequireDefault(_AllOfParser);
 
+var _EnumParser = require('./EnumParser');
+
+var _EnumParser2 = _interopRequireDefault(_EnumParser);
+
 var _chance = require('chance');
 
 var _chance2 = _interopRequireDefault(_chance);
@@ -74,7 +78,7 @@ var Parser = (function () {
     }, {
         key: 'parsers',
         get: function get() {
-            return this._parsers || (this._parsers = [new _StringParser2['default'](), new _ObjectParser2['default'](this), new _ArrayParser2['default'](this), new _AllOfParser2['default'](this), new _NumberParser2['default'](), new _BooleanParser2['default'](), new _DateParser2['default'](), new _BooleanParser2['default']()]);
+            return this._parsers || (this._parsers = [new _EnumParser2['default'](), new _StringParser2['default'](), new _ObjectParser2['default'](this), new _ArrayParser2['default'](this), new _AllOfParser2['default'](this), new _NumberParser2['default'](), new _BooleanParser2['default'](), new _DateParser2['default'](), new _BooleanParser2['default']()]);
         }
     }]);
 

@@ -145,6 +145,18 @@ definitions:
       tag:
         type: string
         x-chance-type: guid
+      age:
+        type: integer
+        multipleOf: 7
+        x-type-options:
+          min: -21
+          max: 21
+      size:
+        type: integer
+        enum:
+          - 1
+          - 2
+          - 3
       type:
         type: string
         enum:

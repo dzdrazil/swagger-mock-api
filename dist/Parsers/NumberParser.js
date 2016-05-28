@@ -29,9 +29,33 @@ var NumberParser = (function () {
     }, {
         key: 'parse',
         value: function parse(node) {
-            if (this.isInteger(node)) return chance.integer(node['x-type-options']);
+            if (this.isInteger(node)) return this.generateInteger(node);
 
             if (this.isFloating(node)) return chance.floating(node['x-type-options']);
+        }
+    }, {
+        key: 'generateInteger',
+        value: function generateInteger(node) {
+            var bounds = this.resolveBounds(node);
+            return chance.integer(bounds) * (node.multipleOf || 1);
+        }
+    }, {
+        key: 'resolveBounds',
+        value: function resolveBounds(node) {
+            var bounds = { min: Number.MIN_SAFE_INTEGER, max: Number.MAX_SAFE_INTEGER };
+
+            Object.assign(bounds, node['x-type-options']);
+
+            if (node.multipleOf < 1) {
+                throw new Error('The value of "multipleOf" MUST be a JSON number. This number MUST be strictly greater than 0.');
+            }
+
+            if (node.multipleOf) {
+                bounds.max = bounds.max / node.multipleOf;
+                bounds.min = bounds.min / node.multipleOf;
+            }
+
+            return bounds;
         }
     }, {
         key: 'isInteger',

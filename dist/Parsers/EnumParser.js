@@ -16,32 +16,32 @@ var _chance2 = _interopRequireDefault(_chance);
 
 var chance = new _chance2['default']();
 
-var StringParser = (function () {
-    function StringParser() {
-        _classCallCheck(this, StringParser);
+var EnumParser = (function () {
+    function EnumParser() {
+        _classCallCheck(this, EnumParser);
     }
 
-    _createClass(StringParser, [{
+    _createClass(EnumParser, [{
         key: 'canParse',
         value: function canParse(node) {
-            return node.type === 'string';
+            return !!node['enum'];
         }
     }, {
         key: 'parse',
         value: function parse(node) {
-            return this.parseString(node);
+            return this.parseEnum(node['enum']);
         }
     }, {
-        key: 'parseString',
-        value: function parseString(node) {
-            var chanceType = node['x-chance-type'] || 'string';
-            return chance[chanceType](node['x-type-options']);
+        key: 'parseEnum',
+        value: function parseEnum(enumNode) {
+            var index = chance.integer({ min: 0, max: enumNode.length - 1 });
+            return enumNode[index];
         }
     }]);
 
-    return StringParser;
+    return EnumParser;
 })();
 
-exports['default'] = StringParser;
+exports['default'] = EnumParser;
 module.exports = exports['default'];
-//# sourceMappingURL=StringParser.js.map
+//# sourceMappingURL=EnumParser.js.map
