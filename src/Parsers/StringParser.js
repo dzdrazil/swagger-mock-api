@@ -1,5 +1,6 @@
 import Chance from 'chance';
 const chance = new Chance();
+import RandExp from 'randexp';
 
 export default class StringParser {
     canParse(node) {
@@ -11,6 +12,14 @@ export default class StringParser {
     }
 
     parseString(node) {
+        if (node.pattern)
+            return new RandExp(node.pattern).gen();
+            
+        let options = this.resolveChanceOptions(node);
+        return chance.string(options);
+    }
+
+    resolveChanceOptions(node) {
         let options = node['x-type-options'] || {};
 
         if (node.maxLength && node.minLength)
@@ -18,6 +27,6 @@ export default class StringParser {
         else
             options.length = options.length || node.maxLength || node.minLength;
 
-        return chance.string(options);
+        return options;
     }
 }

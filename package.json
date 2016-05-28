@@ -21,6 +21,7 @@
     "babel-runtime": "^5.5.6",
     "chance": "~0.7.5",
     "hoek": "~2.14.0",
+    "randexp": "^0.4.2",
     "routes": "~2.0.0",
     "swagger-parser": "^2.4.2",
     "tcomb": "^2.5.2"

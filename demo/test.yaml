@@ -145,10 +145,13 @@ definitions:
       tag:
         type: string
         x-chance-type: guid
-      Kingdom:
+      kingdom:
         type: string
         minLength: 3
         maxLength: 5
+      color:
+        type: string
+        pattern: ^(black|white)ish$
       age:
         type: integer
         multipleOf: 7

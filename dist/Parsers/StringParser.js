@@ -14,6 +14,10 @@ var _chance = require('chance');
 
 var _chance2 = _interopRequireDefault(_chance);
 
+var _randexp = require('randexp');
+
+var _randexp2 = _interopRequireDefault(_randexp);
+
 var chance = new _chance2['default']();
 
 var StringParser = (function () {
@@ -34,11 +38,19 @@ var StringParser = (function () {
     }, {
         key: 'parseString',
         value: function parseString(node) {
+            if (node.pattern) return new _randexp2['default'](node.pattern).gen();
+
+            var options = this.resolveChanceOptions(node);
+            return chance.string(options);
+        }
+    }, {
+        key: 'resolveChanceOptions',
+        value: function resolveChanceOptions(node) {
             var options = node['x-type-options'] || {};
 
             if (node.maxLength && node.minLength) options.length = chance.integer({ max: node.maxLength, min: node.minLength });else options.length = options.length || node.maxLength || node.minLength;
 
-            return chance.string(options);
+            return options;
         }
     }]);
 
