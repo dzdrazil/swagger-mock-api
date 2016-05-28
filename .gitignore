@@ -1,7 +1,8 @@
 # Logs
 logs
 *.log
-
+*.map
+.vscode
 # Runtime data
 pids
 *.pid

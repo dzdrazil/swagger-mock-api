@@ -143,6 +143,14 @@ definitions:
       tag:
         type: string
         x-chance-type: guid
+      type:
+        type: string
+        enum:
+          - CAT
+          - DOG
+          - TURTLE
+          - RABBIT
+          - TYRANNOSAURUS
       owner:
         type: object
         properties:
