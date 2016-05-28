@@ -36,6 +36,7 @@ export default class NumberParser {
             bounds.min = node.minimum + (node.exclusiveMinimum ? 1 : 0);
         }
 
+        //http://mathforum.org/library/drmath/view/60913.html
         if (node.multipleOf) {
             bounds.min = bounds.min / node.multipleOf;
             bounds.max = bounds.max / node.multipleOf;

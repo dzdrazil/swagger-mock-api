@@ -37,7 +37,7 @@ var ArrayParser = (function () {
         key: 'generateArray',
         value: function generateArray(node) {
             var items = node.items;
-            var options = node['x-type-options'] || { min: 0, max: 10 };
+            var options = node['x-type-options'] || { min: node.minItems, max: node.maxItems };
             var iterations = chance.integer(options);
             var ret = [];
 

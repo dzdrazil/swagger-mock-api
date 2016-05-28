@@ -16,7 +16,7 @@ export default class ArrayParser {
 
     generateArray(node) {
         let items = node.items;
-        var options = node['x-type-options'] || { min: 0, max: 10 };
+        var options = node['x-type-options'] || { min: node.minItems, max: node.maxItems };
         let iterations = chance.integer(options);
         let ret = [];
 
