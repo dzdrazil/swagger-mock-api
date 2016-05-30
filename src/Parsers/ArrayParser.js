@@ -5,7 +5,7 @@ export default class ArrayParser {
     constructor(parser) {
         this.parser = parser;
     }
-    
+
     canParse(node) {
         return node.type === 'array';
     }
@@ -16,7 +16,11 @@ export default class ArrayParser {
 
     generateArray(node) {
         let items = node.items;
-        var options = node['x-type-options'] || { min: node.minItems, max: node.maxItems };
+        let options = node['x-type-options'] || {};
+
+        options.min = options.min || node.minItems || 0;
+        options.max = options.max || node.maxItems || 10;
+
         let iterations = chance.integer(options);
         let ret = [];
 
