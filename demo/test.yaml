@@ -125,8 +125,10 @@ definitions:
             format: int64
             x-type-options:
               min: 1
-              max: 1000000
+              max: 2
           # demo of a fixed type value
+          created:
+            type: date
           status:
             type: object
             x-chance-type: fixed
@@ -143,6 +145,38 @@ definitions:
       tag:
         type: string
         x-chance-type: guid
+      kingdom:
+        type: string
+        minLength: 3
+        maxLength: 5
+      color:
+        type: string
+        pattern: ^(black|white)ish$
+      age:
+        type: integer
+        multipleOf: 7
+        minimum: 1
+        maximum: 21
+      weight:
+        type: integer
+        minimum: 3
+        exclusiveMinimum: false
+        maximum: 5
+        exclusiveMaximum: true
+      size:
+        type: integer
+        enum:
+          - 1
+          - 2
+          - 3
+      type:
+        type: string
+        enum:
+          - CAT
+          - DOG
+          - TURTLE
+          - RABBIT
+          - TYRANNOSAURUS
       owner:
         type: object
         properties:
