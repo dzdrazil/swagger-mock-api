@@ -19,7 +19,7 @@ export default function(config) {
   let router;
 
   let parserPromise = new Promise((resolve) => {
-    parser.parse(config.swaggerFile, function(err, api) {
+    parser.dereference(config.swaggerFile, function(err, api) {
       if (err) throw err;
 
       init(api);
@@ -29,7 +29,7 @@ export default function(config) {
 
   if (config.watch) {
     fs.watchFile(config.swaggerFile, function() {
-      parser.parse(config.swaggerFile, function(err, api) {
+      parser.dereference(config.swaggerFile, function(err, api) {
         if (err) throw err;
 
         init(api);

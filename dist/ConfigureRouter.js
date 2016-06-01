@@ -2,7 +2,9 @@
 
 var _interopRequireDefault = require('babel-runtime/helpers/interop-require-default')['default'];
 
-exports.__esModule = true;
+Object.defineProperty(exports, '__esModule', {
+  value: true
+});
 exports['default'] = ConfigureRouter;
 
 var _routes = require('routes');
@@ -30,7 +32,7 @@ function correctPath(path) {
 
 // wrapped MockData to satisfy eslint's no funciton definitions inside of loops
 function mock(schema) {
-  return _MockData2['default'](schema);
+  return (0, _MockData2['default'])(schema);
 }
 
 function generateResponse(potentialResponses) {

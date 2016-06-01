@@ -1,7 +1,11 @@
 /* eslint no-loop-func:0*/
 'use strict';
 
-exports.__esModule = true;
+var _toArray = require('babel-runtime/helpers/to-array')['default'];
+
+Object.defineProperty(exports, '__esModule', {
+  value: true
+});
 exports['default'] = PrunePaths;
 
 function PrunePaths(paths, passthroughPaths, keep) {
@@ -12,9 +16,11 @@ function PrunePaths(paths, passthroughPaths, keep) {
 
     var _p$split$reverse = p.split(' ').reverse();
 
-    var path = _p$split$reverse[0];
+    var _p$split$reverse2 = _toArray(_p$split$reverse);
 
-    var methods = _p$split$reverse.slice(1);
+    var path = _p$split$reverse2[0];
+
+    var methods = _p$split$reverse2.slice(1);
 
     if (methods.length) {
       methods = methods.map(function (x) {

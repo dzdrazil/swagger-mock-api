@@ -4,7 +4,9 @@ var _Promise = require('babel-runtime/core-js/promise')['default'];
 
 var _interopRequireDefault = require('babel-runtime/helpers/interop-require-default')['default'];
 
-exports.__esModule = true;
+Object.defineProperty(exports, '__esModule', {
+  value: true
+});
 
 var _url = require('url');
 
@@ -39,7 +41,7 @@ exports['default'] = function (config) {
   var router = undefined;
 
   var parserPromise = new _Promise(function (resolve) {
-    _swaggerParser2['default'].parse(config.swaggerFile, function (err, api) {
+    _swaggerParser2['default'].dereference(config.swaggerFile, function (err, api) {
       if (err) throw err;
 
       init(api);
@@ -49,7 +51,7 @@ exports['default'] = function (config) {
 
   if (config.watch) {
     _fs2['default'].watchFile(config.swaggerFile, function () {
-      _swaggerParser2['default'].parse(config.swaggerFile, function (err, api) {
+      _swaggerParser2['default'].dereference(config.swaggerFile, function (err, api) {
         if (err) throw err;
 
         init(api);
@@ -59,13 +61,13 @@ exports['default'] = function (config) {
 
   function init(api) {
     if (config.ignorePaths) {
-      api.paths = _PrunePaths2['default'](api.paths, config.ignorePaths);
+      api.paths = (0, _PrunePaths2['default'])(api.paths, config.ignorePaths);
     } else if (config.mockPaths) {
-      api.paths = _PrunePaths2['default'](api.paths, config.mockPaths, true);
+      api.paths = (0, _PrunePaths2['default'])(api.paths, config.mockPaths, true);
     }
 
     basePath = api.basePath || '';
-    router = _ConfigureRouter2['default'](api.paths);
+    router = (0, _ConfigureRouter2['default'])(api.paths);
   }
 
   return function (req, res, next) {
