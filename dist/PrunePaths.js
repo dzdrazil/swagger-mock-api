@@ -1,12 +1,12 @@
 /* eslint no-loop-func:0*/
 'use strict';
 
+var _toArray = require('babel-runtime/helpers/to-array')['default'];
+
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
 exports['default'] = PrunePaths;
-
-function _toArray(arr) { return Array.isArray(arr) ? arr : Array.from(arr); }
 
 function PrunePaths(paths, passthroughPaths, keep) {
   var replacement = {};
@@ -51,4 +51,3 @@ function PrunePaths(paths, passthroughPaths, keep) {
 }
 
 module.exports = exports['default'];
-//# sourceMappingURL=PrunePaths.js.map

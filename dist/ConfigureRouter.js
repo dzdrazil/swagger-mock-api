@@ -1,11 +1,11 @@
 'use strict';
 
+var _interopRequireDefault = require('babel-runtime/helpers/interop-require-default')['default'];
+
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
 exports['default'] = ConfigureRouter;
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
 var _routes = require('routes');
 
@@ -78,4 +78,3 @@ function ConfigureRouter(paths) {
 }
 
 module.exports = exports['default'];
-//# sourceMappingURL=ConfigureRouter.js.map

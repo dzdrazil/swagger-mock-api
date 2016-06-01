@@ -1,10 +1,12 @@
 'use strict';
 
+var _Promise = require('babel-runtime/core-js/promise')['default'];
+
+var _interopRequireDefault = require('babel-runtime/helpers/interop-require-default')['default'];
+
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
 var _url = require('url');
 
@@ -38,8 +40,8 @@ exports['default'] = function (config) {
   var basePath = undefined;
   var router = undefined;
 
-  var parserPromise = new Promise(function (resolve) {
-    _swaggerParser2['default'].parse(config.swaggerFile, function (err, api) {
+  var parserPromise = new _Promise(function (resolve) {
+    _swaggerParser2['default'].dereference(config.swaggerFile, function (err, api) {
       if (err) throw err;
 
       init(api);
@@ -49,7 +51,7 @@ exports['default'] = function (config) {
 
   if (config.watch) {
     _fs2['default'].watchFile(config.swaggerFile, function () {
-      _swaggerParser2['default'].parse(config.swaggerFile, function (err, api) {
+      _swaggerParser2['default'].dereference(config.swaggerFile, function (err, api) {
         if (err) throw err;
 
         init(api);
@@ -102,4 +104,3 @@ exports['default'] = function (config) {
 
 ;
 module.exports = exports['default'];
-//# sourceMappingURL=index.js.map
