@@ -45,7 +45,7 @@ export default function(config) {
     }
 
     basePath = api.basePath || '';
-    router = ConfigureRouter(api.paths);
+    router = ConfigureRouter(api.paths, config.mock || {});
   }
 
   return function(req, res, next) {

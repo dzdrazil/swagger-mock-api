@@ -20,27 +20,31 @@ function correctPath(path) {
 }
 
 // wrapped MockData to satisfy eslint's no funciton definitions inside of loops
-function mock(schema) {
-  return MockData(schema);
+function mock(schema, configMock) {
+  return MockData(schema, configMock);
 }
 
-function generateResponse(potentialResponses) {
-  for (let k in potentialResponses) {
+function generateResponse(potentialResponses, configMock) {
+  let keys = Object.keys(potentialResponses);
+
+  keys.sort(); //use 200 example
+
+  for (const k of keys) {
     if (k === 'default') continue;
 
     let responseSchema = potentialResponses[k];
     let responseCode = parseInt(k, 10);
     if (responseCode > 199 && responseCode < 300) {
-      return mock.bind(null, responseSchema);
+      return mock.bind(null, responseSchema, configMock);
     }
   }
 
   if (potentialResponses.default) {
-    return mock.bind(null, potentialResponses.default);
+    return mock.bind(null, potentialResponses.default, configMock);
   }
 }
 
-export default function ConfigureRouter(paths) {
+export default function ConfigureRouter(paths, configMock) {
   let router = new Routes();
 
   for (let pk in paths) {
@@ -58,7 +62,7 @@ export default function ConfigureRouter(paths) {
         console.log('ADDING ROUTE: ', mk.toUpperCase() + ' ' + pk);
       }
 
-      let respond = generateResponse(method.responses, pk);
+      let respond = generateResponse(method.responses, configMock);
       router.addRoute('/' + mk + route, respond);
     }
   }
