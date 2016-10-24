@@ -44,7 +44,11 @@ module.exports = function(grunt) {
           middleware: [
             mockApi({
                   swaggerFile: path.join(__dirname, 'path to swagger YAML or JSON file'),
-                  watch: true // enable reloading the routes and schemas when the swagger file changes
+                  watch: true, // enable reloading the routes and schemas when the swagger file changes
+                  mock: {
+                    useExamples: false, //use application/json example
+                    extendExamples: false //extend example data with random values
+                  }
               })
           ],
         },
